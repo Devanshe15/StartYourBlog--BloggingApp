@@ -1,68 +1,67 @@
-import React from 'react';
-import '../App.css'; 
+import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../firebaseConfig"; 
+import "./Signup.css";
 
-const SignUp = () => {
+const Signup = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isSignUp, setIsSignUp] = useState(true);
+    const navigate = useNavigate();
+
+    const handleGoogleSignIn = async () => {
+        try {
+            const provider = new GoogleAuthProvider(); 
+            await signInWithPopup(auth, provider);
+            navigate('/landing'); 
+        } catch (error) {
+            console.error("Google Sign-In Error:", error);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            if (isSignUp) {
+                await createUserWithEmailAndPassword(auth, email, password);
+            } else {
+                await signInWithEmailAndPassword(auth, email, password);
+            }
+            navigate('/landing');
+        } catch (error) {
+            console.error("Authentication Error:", error.message);
+        }
+    };
+
     return (
-        <div>
-            <h2>Sign Up</h2>
-            <form>
-                {/* Email input */}
-                <div data-mdb-input-init className="form-outline mb-4">
-                    <input type="email" id="form2Example1" className="form-control" />
-                    <label className="form-label" htmlFor="form2Example1">Email address</label>
-                </div>
-
-                {/* Password input */}
-                <div data-mdb-input-init className="form-outline mb-4">
-                    <input type="password" id="form2Example2" className="form-control" />
-                    <label className="form-label" htmlFor="form2Example2">Password</label>
-                </div>
-
-                {/* 2 column grid layout for inline styling */}
-                <div className="row mb-4">
-                    <div className="col d-flex justify-content-center">
-                        {/* Checkbox */}
-                        <div className="form-check">
-                            <input className="form-check-input" type="checkbox" value="" id="form2Example31" checked />
-                            <label className="form-check-label" htmlFor="form2Example31"> Remember me </label>
-                        </div>
-                    </div>
-
-                    <div className="col">
-                        {/* Simple link */}
-                        <a href="#!">Forgot password?</a>
-                    </div>
-                </div>
-
-                {/* Submit button */}
-                <button type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-block mb-4">Sign in</button>
-
-                {/* Register buttons */}
-                <div className="text-center">
-                    <p>Not a member? <a href="#!">Register</a></p>
-                    <p>or sign up with:</p>
-                    <button type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
-                        <i className="fab fa-facebook-f"></i>
-                    </button>
-
-                    <button type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
-                        <i className="fab fa-google"></i>
-                    </button>
-
-                    <button type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
-                        <i className="fab fa-twitter"></i>
-                    </button>
-
-                    <button type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
-                        <i className="fab fa-github"></i>
-                    </button>
-                </div>
+        <div className="signup-container">
+            <h2>{isSignUp ? "Sign Up" : "Sign In"}</h2>
+            <form onSubmit={handleSubmit}>
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
+                <button type="submit">{isSignUp ? "Sign Up" : "Sign In"}</button>
             </form>
-            <div className="col-sm-6 px-0 d-none d-sm-block">
-                {/* <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img3.webp" height="300" width="300" alt="Login" className="w-100 vh-100" style={{ objectFit: 'cover', objectPosition: 'left' }} /> */}
-            </div>
+            <button onClick={handleGoogleSignIn} className="google-btn">
+                Continue with Google
+            </button>
+            <p onClick={() => setIsSignUp(!isSignUp)}>
+                {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+            </p>
         </div>
     );
 };
 
-export default SignUp;
+export default Signup;
