@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { db, auth } from "../firebaseConfig"; // Import Firestore
-import { collection, addDoc, serverTimestamp } from "firebase/firestore"; // Firestore functions
+import { addPost } from "../utils/firestoreQueries";  // Import the Firestore function
+import { auth } from "../firebaseConfig";  // Import auth for user ID
 
 const CreatePost = () => {
     const [title, setTitle] = useState("");
@@ -8,23 +8,25 @@ const CreatePost = () => {
 
     const handleCreatePost = async () => {
         if (!title || !content) {
-            alert("Title and Content cannot be empty!");
+            alert("Title and content cannot be empty!");
             return;
         }
-
         try {
-            await addDoc(collection(db, "posts"), {
-                title,
-                content,
-                author: auth.currentUser?.displayName || "Anonymous",
-                createdAt: serverTimestamp(),
-            });
+            const userId = auth.currentUser?.uid;  // Get logged-in user's ID
+            if (!userId) {
+                alert("Please log in to create a post!");
+                return;
+            }
 
-            alert("Post Created Successfully!");
+            const postId = await addPost(title, content, userId);  // Call Firestore function
+            console.log("Post created with ID:", postId);
+            alert("Post created successfully!");
+
+            // Clear input fields after posting
             setTitle("");
             setContent("");
         } catch (error) {
-            console.error("Error creating post:", error);
+            console.error("Failed to create post:", error.message);
         }
     };
 
@@ -38,7 +40,7 @@ const CreatePost = () => {
                 onChange={(e) => setTitle(e.target.value)}
             />
             <textarea
-                placeholder="Write your post..."
+                placeholder="Content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
             />
