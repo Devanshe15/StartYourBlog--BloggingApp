@@ -1,5 +1,7 @@
-import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { useState } from "react";
+import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword } from "firebase/auth";
+
+import React, { useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebaseConfig"; 
 import "./Signup.css";
