@@ -17,7 +17,7 @@ const CreatePost = () => {
                 title,
                 content,
                 author: auth.currentUser?.displayName || "Anonymous",
-                createdAt: serverTimestamp(), // Store timestamp
+                createdAt: serverTimestamp(),
             });
 
             alert("Post Created Successfully!");
